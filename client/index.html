@@ -1,0 +1,706 @@
+<!doctype html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="./style.css" type="text/css">
+    <script src="https://code.createjs.com/1.0.0/createjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.2/TweenMax.min.js"></script>
+    <script src="./js/background.js"></script>
+</head>
+
+<body id="body" style="background-image:url('/client/img/bgImage.png');background-size: auto;background-color:rgba(225, 229, 241, 0.178);">
+    <audio id="audio" src="/client/bgm/main.mp3" controls autoplay style="display:none;" volume="0.1" loop>
+        <p>If you are reading this, it is because your browser does not support the audio element.</p>
+    </audio>
+
+    <div id="signDiv" class="container">
+        <div class="col-md-12">
+            <p>Username: <input class="form-control" id="signDiv-username" type="text" /></p>
+        </div>
+        <div class="col-md-12">
+            <p>Password: <input class="form-control" id="signDiv-password" type="password" /></p>
+        </div>
+        <button class="btn btn-outline-dark col-md-3" id="signDiv-signIn">Sign In</button>
+        <button class="btn btn-outline-dark col-md-3" id="signDiv-signUp">Sign Up</button>
+        <button class="btn btn-outline-dark col-md-3" id="signDiv-reset">Reset</button>
+    </div>
+
+    <div id="displayDiv" style="display:none;">
+        <div id="game" style="position:absolute;width:480px;height:800px;">
+            <canvas id="ctx" width="480" height="800" style="position:absolute;border:1px solid #000000; z-index: 0"></canvas>
+
+            <div id="menuDiv" style="display:none;position:absolute;width:480px;height:800px;">
+
+                <button class="btn btn-success" id="menuDiv-logout">Logout</button>
+                <button class="btn btn-success" id="menuDiv-mute">Close music</button>
+
+                <hr />
+
+                <label id="menuDiv-status" class="span-status">Player status</label>
+
+                <hr />
+
+                <label id="menuDiv-lbl-moodle">Module</label>
+
+                <hr />
+
+                <button class="btn btn-success" id="menuDiv-module1">Module 1</button>
+                <button class="btn btn-success" id="menuDiv-module2">Module 2</button>
+
+                <hr />
+
+                <label id="menuDiv-lbl-chatroom">Chatroom</label>
+                <div id="chat-text" style="width:480px;height:100px;overflow-y:scroll">
+                </div>
+
+                <form id="chat-form">
+                    <input class="form-control" id="chat-input" type="text" style="width:480px"></input>
+                </form>
+
+                <hr />
+                <button class="btn btn-success" id="menuDiv-profile">Profile</button>
+                <button class="btn btn-success" id="menuDiv-pet">Pet</button>
+                <button class="btn btn-success" id="menuDiv-summon">Summon</button>
+                <button class="btn btn-success" id="menuDiv-friend">Friend</button>
+                <button class="btn btn-success" id="menuDiv-ranking">Ranking</button>
+            </div>
+
+            <div id="module1LevelDiv" style="display:none;position:absolute;width:480px;height:800px;">
+                <button class="btn btn-success" id="module1LevelDiv-return" class="btn-return">Return</button>
+                <label id="module1LevelDiv-status" class="span-status">Player status</label>
+                <br />
+                <button class="btn btn-success" id="module1LevelDiv-easy">Easy</button><br />
+                <button class="btn btn-success" id="module1LevelDiv-normal">Normal</button><br />
+                <button class="btn btn-success" id="module1LevelDiv-hard">Hard</button><br />
+            </div>
+
+            <div id="module2LevelDiv" style="display:none;position:absolute;width:480px;height:800px;">
+                <button class="btn btn-success" id="module2LevelDiv-return" class="btn-return">Return</button>
+                <label id="module2LevelDiv-status" class="span-status">Player status</label>
+                <br />
+                <button class="btn btn-success" id="module2LevelDiv-easy">Easy</button><br />
+                <button class="btn btn-success" id="module2LevelDiv-normal">Normal</button><br />
+                <button class="btn btn-success" id="module2LevelDiv-hard">Hard</button><br />
+            </div>
+
+            <div id="profileDiv" style="display:none;position:absolute;width:480px;height:800px;">
+                <label id='profileDiv-lbl-profile'>Profile</label>
+                <button class="btn btn-success" id="profileDiv-return" class="btn-return">Return</button>
+                <hr />
+                Player ID: <input type="text" id="profileDiv-player-id" readonly />
+                <br />
+                Name: <input type="text" id="profileDiv-name" readonly />
+            </div>
+
+            <div id="petDiv" style="display:none;position:absolute;width:480px;height:800px;">
+                <button class="btn btn-success" id="petDiv-return">Return</button>
+                <hr />
+                <label id='petDiv-lbl-pet'>Pet</label>
+            </div>
+
+            <div id="summonDiv" style="display:none;position:absolute;width:480px;height:800px;">
+                <audio id="summonDiv-result-effect" style="display:none;" volume="0.1" autoplay></audio>
+                <button class="btn btn-success" id="summonDiv-return">Return</button>
+                <hr />
+                <label id='summonDiv-lbl-summon'>Summon</label>
+                <hr />
+                <label id='summonDiv-lbl-normal'>Normal: 60%</label><br />
+                <label id='summonDiv-lbl-rare'>Rare: 30%</label><br />
+                <label id='summonDiv-lbl-super-rare'>Super Rare: 10%</label><br />
+                <hr />
+                <button class="btn btn-success" id="summonDiv-summon">Summon</button>
+                <hr />
+                <label id='summonDiv-lbl-result'></label><br />
+            </div>
+
+            <div id="friendDiv" style="display:none;position:absolute;width:480px;height:800px;">
+                <button class="btn btn-success" id="friendDiv-return">Return</button>
+                <hr />
+                <label id='friendDiv-lbl-friend'>Friend</label>
+            </div>
+
+            <div id="rankingDiv" style="display:none;position:absolute;width:480px;height:800px;">
+                <button class="btn btn-success" id="rankingDiv-return">Return</button>
+                <hr />
+                <label id='rankingDiv-lbl-ranking'>Ranking</label>
+            </div>
+
+            <div id="gameDiv" style="display:none;position:absolute;width:480px;height:800px;">
+                <button class="btn btn-success" id="gameDiv-back-to-menu" class="btn-return">Back to menu</button>
+                <button class="btn btn-success" id="gameDiv-choose-level" class="btn-return">Choose level</button>
+                <button class="btn btn-success" id="gameDiv-mute">Close music</button>
+                <label id='gameDiv-wave'></label>
+                <label id='gameDiv-coin'></label>
+                <label id='gameDiv-score'></label>
+                <hr />
+                <label id='gameDiv-enemy-hp'></label>
+                <hr />
+                <label id='gameDiv-player-hp'></label>
+                <hr />
+                <label id="gameDiv-timer"></label>
+                <hr />
+                <label id="gameDiv-question"></label>
+                <hr />
+                <label id="gameDiv-answer-response">　</label>
+                <hr />
+                <button class="btn btn-success" id="gameDiv-ans_a" onclick="submitAnswer('gameDiv-ans_a')">A</button>
+                <button class="btn btn-success" id="gameDiv-ans_b" onclick="submitAnswer('gameDiv-ans_b')">B</button>
+                <button class="btn btn-success" id="gameDiv-ans_c" onclick="submitAnswer('gameDiv-ans_c')">C</button>
+                <button class="btn btn-success" id="gameDiv-ans_d" onclick="submitAnswer('gameDiv-ans_d')">D</button>
+            </div>
+
+            <div id="resultDiv" style="display:none;position:absolute;width:480px;height:800px;">
+                <label id=resultDiv-lbl-result>Result</label>
+                <hr />
+                <p id='resultDiv-exp'></p>
+                <p id='resultDiv-coin'></p>
+                <p id='resultDiv-score'></p>
+                <button class="btn btn-success" id="resultDiv-back-to-menu" class="btn-return">Back to menu</button>
+                <button class="btn btn-success" id="resultDiv-choose-level" class="btn-return">Choose level</button>
+                <button class="btn btn-success" id="resultDiv-share" class="btn-return">Share</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        var canvas = document.getElementById('ctx');
+        var context = canvas.getContext('2d');
+        var imageObj = new Image();
+        imageObj.src = './img/background4.png';
+        window.onload = function () {
+            context.drawImage(imageObj, 0, 0);
+        };
+    </script>
+
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
+    <script>
+        var socket = io();
+
+        var audio = document.getElementById('audio');
+
+        // chat
+        var chatText = document.getElementById('chat-text');
+        var chatInput = document.getElementById('chat-input');
+        var chatForm = document.getElementById('chat-form');
+
+        socket.on('addToChat', function (data) {
+            chatText.innerHTML += '<div>' + data + '</div>';
+        });
+
+        socket.on('evalAnswer', function (data) {
+            console.log(data);
+        });
+
+        chatForm.onsubmit = function (e) {
+            e.preventDefault();
+            if (chatInput.value[0] === '/')
+                socket.emit('evalServer', chatInput.value.slice(1));
+            else
+                socket.emit('sendMsgToServer', chatInput.value);
+            chatInput.value = '';
+        }
+
+        // sign
+        var signDiv = document.getElementById('signDiv');
+        var signDivUsername = document.getElementById('signDiv-username');
+        var signDivPassword = document.getElementById('signDiv-password');
+        var signDivSignIn = document.getElementById('signDiv-signIn');
+        var signDivSignUp = document.getElementById('signDiv-signUp');
+        var signDivReset = document.getElementById('signDiv-reset');
+
+        signDivSignIn.onclick = function () {
+            socket.emit('signIn', {
+                username: signDivUsername.value,
+                password: signDivPassword.value
+            });
+        }
+
+        signDivSignUp.onclick = function () {
+            socket.emit('signUp', {
+                username: signDivUsername.value,
+                password: signDivPassword.value
+            });
+        }
+
+        signDivReset.onclick = function () {
+            signDivUsername.value = null;
+            signDivPassword.value = null;
+        }
+
+        socket.on('signInResponse', function (data) {
+            if (data.success) {
+                signDiv.style.display = 'none';
+                displayDiv.style.display = 'inline-block';
+                menuDiv.style.display = 'inline-block';
+                //document.getElementById('body').removeAttribute("style")
+            } else {
+                alert("Sign in unsuccessul.");
+            }
+        });
+
+        socket.on('signUpResponse', function (data) {
+            if (data.success) {
+                alert("Sign up successul.");
+            } else {
+                alert("Sign up unsuccessul.");
+            }
+        });
+
+        var player_status = {};
+
+        socket.on('initPlayer', function (data) {
+            player_status = data.status;
+            var status = 'Name: ' + player_status.name + '\tLevel: ' + player_status.level + '\tExp: ' +
+                player_status.current_exp + ' / ' + player_status.max_exp + '\tCoin: ' +
+                player_status.coin;
+            document.getElementById('menuDiv-status').innerHTML = status;
+            document.getElementById('module1LevelDiv-status').innerHTML = status;
+            document.getElementById('module2LevelDiv-status').innerHTML = status;
+        });
+
+
+        // menu
+        var menuDiv = document.getElementById('menuDiv');
+        var menuDivAudio = document.getElementById('menuDiv-audio');
+        var menuDivLogout = document.getElementById('menuDiv-logout');
+        var menuDivStatus = document.getElementById('menuDiv-status');
+        var menuDivMute = document.getElementById('menuDiv-mute');
+        var menuDivModule1 = document.getElementById('menuDiv-module1');
+        var menuDivModule2 = document.getElementById('menuDiv-module2');
+        var menuDivProfile = document.getElementById('menuDiv-profile');
+        var menuDivPet = document.getElementById('menuDiv-pet');
+        var menuDivSummon = document.getElementById('menuDiv-summon');
+        var menuDivFriend = document.getElementById('menuDiv-friend');
+        var menuDivRanking = document.getElementById('menuDiv-ranking');
+
+        menuDivLogout.onclick = function () {
+            document.getElementById('chat-text').innerHTML = "";
+            socket.emit('disconnect');
+            menuDiv.style.display = 'none';
+            displayDiv.style.display = 'none';
+            signDiv.style.display = 'inline-block';
+        }
+
+        menuDivMute.onclick = function () {
+            if (audio.muted) {
+                audio.muted = false;
+                menuDivMute.innerHTML = 'Close music';
+            } else {
+                audio.muted = true;
+                menuDivMute.innerHTML = 'Open music';
+            }
+        }
+
+
+        menuDivModule1.onclick = function () {
+            menuDiv.style.display = 'none';
+            module1LevelDiv.style.display = 'inline-block';
+        }
+
+        menuDivModule2.onclick = function () {
+            menuDiv.style.display = 'none';
+            module2LevelDiv.style.display = 'inline-block';
+        }
+
+        menuDivProfile.onclick = function () {
+            menuDiv.style.display = 'none';
+            profileDiv.style.display = 'inline-block';
+        }
+
+        menuDivPet.onclick = function () {
+            menuDiv.style.display = 'none';
+            petDiv.style.display = 'inline-block';
+        }
+
+        menuDivSummon.onclick = function () {
+            menuDiv.style.display = 'none';
+            summonDiv.style.display = 'inline-block';
+        }
+
+        menuDivFriend.onclick = function () {
+            menuDiv.style.display = 'none';
+            friendDiv.style.display = 'inline-block';
+        }
+
+        menuDivRanking.onclick = function () {
+            menuDiv.style.display = 'none';
+            rankingDiv.style.display = 'inline-block';
+        }
+
+        // module1's level
+        var module1LevelDiv = document.getElementById('module1LevelDiv');
+        var module1LevelDivReturn = document.getElementById('module1LevelDiv-return');
+        var module1LevelDivStatus = document.getElementById('module1LevelDiv-status');
+        var module1LevelDivEasy = document.getElementById('module1LevelDiv-easy');
+        var module1LevelDivNormal = document.getElementById('module1LevelDiv-normal');
+        var module1LevelDivHard = document.getElementById('module1LevelDiv-hard');
+
+        module1LevelDivReturn.onclick = function () {
+            module1LevelDiv.style.display = 'none';
+            menuDiv.style.display = 'inline-block';
+        }
+
+        module1LevelDivEasy.onclick = function () {
+            module1LevelDiv.style.display = 'none';
+            gameDiv.style.display = 'inline-block';
+            audio.src = '/client/bgm/level.mp3';
+            socket.emit('initGame', {
+                player_id: player_status.player_id,
+                stage_id: 1,
+            });
+        }
+
+        // module2's level
+        var module2LevelDiv = document.getElementById('module1LevelDiv');
+        var module2LevelDivReturn = document.getElementById('module1LevelDiv-return');
+        var module2LevelDivStatus = document.getElementById('module1LevelDiv-status');
+        var module2LevelDivEasy = document.getElementById('module1LevelDiv-easy');
+        var module2LevelDivNormal = document.getElementById('module1LevelDiv-normal');
+        var module2LevelDivHard = document.getElementById('module1LevelDiv-hard');
+
+        module2LevelDivReturn.onclick = function () {
+            module2LevelDiv.style.display = 'none';
+            menuDiv.style.display = 'inline-block';
+        }
+
+        /*
+        module2LevelDivEasy.onclick = function () {
+            module2LevelDiv.style.display = 'none';
+            gameDiv.style.display = 'inline-block';
+            
+            socket.emit('init', {
+                player_id: 1,
+                stage_id: 1,
+            });
+        }
+        */
+
+        // profile
+        var profileDiv = document.getElementById('profileDiv');
+        var profileDivReturn = document.getElementById('profileDiv-return');
+        var module1LevelDivPlayerId = document.getElementById('profileDiv-player-id');
+        var module1LevelDivName = document.getElementById('profileDiv-name');
+
+        profileDivReturn.onclick = function () {
+            profileDiv.style.display = 'none';
+            menuDiv.style.display = 'inline-block';
+        }
+
+        // pet
+        var petDiv = document.getElementById('petDiv');
+        var petDivReturn = document.getElementById('petDiv-return');
+
+        petDivReturn.onclick = function () {
+            petDiv.style.display = 'none';
+            menuDiv.style.display = 'inline-block';
+        }
+
+        // summon
+        var summonDiv = document.getElementById('summonDiv');
+        var summonDivReturn = document.getElementById('summonDiv-return');
+        var summonDivSummon = document.getElementById('summonDiv-summon');
+        var summonDivResult = document.getElementById('summonDiv-lbl-result');
+        var summonDivResultEffect = document.getElementById('summonDiv-result-effect');
+
+        summonDivReturn.onclick = function () {
+            summonDivResult.innerHTML = "";
+            summonDiv.style.display = 'none';
+            menuDiv.style.display = 'inline-block';
+        }
+
+        summonDivSummon.onclick = function () {
+            summonDivResult.innerHTML = "";
+            socket.emit('summonPet');
+        }
+
+        socket.on('summonPetResponse', function (data) {
+            var rarity = covertRarityName(data.rarity);
+            summonDivResultEffect.load();
+            summonDivResult.innerHTML =
+                '<label>Your got a new pet!</label><hr/>' +
+                '<label>' + 'ID: ' + data.pet_id + ' Name: ' + data.name + ' Rarity: ' + rarity + '</label>';
+        });
+
+        var covertRarityName = function (rarity) {
+            var name = "";
+            switch (rarity) {
+                case 1:
+                    name = 'Normal';
+                    summonDivResultEffect.src = '/se/normal.mp3'
+                    break;
+                case 2:
+                    name = 'Rare';
+                    summonDivResultEffect.src = '/se/rare.mp3'
+                    break;
+                case 3:
+                    name = 'Super Rare';
+                    summonDivResultEffect.src = '/se/super_rare.mp3'
+                    break;
+            }
+            return name;
+        }
+
+        // friend
+        var friendDiv = document.getElementById('friendDiv');
+        var friendDivReturn = document.getElementById('friendDiv-return');
+
+        friendDivReturn.onclick = function () {
+            friendDiv.style.display = 'none';
+            menuDiv.style.display = 'inline-block';
+        }
+
+        // ranking
+        var rankingDiv = document.getElementById('rankingDiv');
+        var rankingDivReturn = document.getElementById('rankingDiv-return');
+
+        rankingDivReturn.onclick = function () {
+            rankingDiv.style.display = 'none';
+            menuDiv.style.display = 'inline-block';
+        }
+
+        // result
+        var resultDiv = document.getElementById('resultDiv');
+        var resultDivExp = document.getElementById('resultDiv-exp');
+        var resultDivCoin = document.getElementById('resultDiv-coin');
+        var resultDivScore = document.getElementById('resultDiv-score');
+        var resultDivBackToMenu = document.getElementById('resultDiv-back-to-menu');
+        var resultDivChooseLevel = document.getElementById('resultDiv-choose-level');
+        var resultDivShare = document.getElementById('resultDiv-share');
+
+        resultDivBackToMenu.onclick = function () {
+            resultDiv.style.display = 'none';
+            menuDiv.style.display = 'inline-block';
+            audio.src = '/client/bgm/main.mp3';
+        }
+
+        resultDivChooseLevel.onclick = function () {
+            resultDiv.style.display = 'none';
+            module1LevelDiv.style.display = 'inline-block';
+            audio.src = '/client/bgm/main.mp3';
+        }
+
+        var updateResult = function (data) {
+            resultDivExp.innerHTML = 'Got exp: ' + data.exp;
+            resultDivCoin.innerHTML = 'Coin: ' + data.coin;
+            resultDivScore.innerHTML = 'Score: ' + data.score;
+            updatePlayerStatus({
+                exp: data.exp,
+                coin: data.coin,
+            });
+        }
+
+        // game
+        var gameDiv = document.getElementById('gameDiv');
+        var gameDivBackToMenu = document.getElementById('gameDiv-back-to-menu');
+        var gameDivChooseLevel = document.getElementById('gameDiv-choose-level');
+        var gameDivMute = document.getElementById('gameDiv-mute');
+
+        gameDivMute.onclick = function () {
+            if (audio.muted) {
+                audio.muted = false;
+                gameDivMute.innerHTML = 'Close music';
+            } else {
+                audio.muted = true;
+                gameDivMute.innerHTML = 'Open music';
+            }
+        }
+
+        gameDivBackToMenu.onclick = function () {
+            gameDiv.style.display = 'none';
+            menuDiv.style.display = 'inline-block';
+            socket.emit('endTimer');
+            audio.src = '/client/bgm/main.mp3';
+        }
+
+        gameDivChooseLevel.onclick = function () {
+            gameDiv.style.display = 'none';
+            module1LevelDiv.style.display = 'inline-block';
+            socket.emit('endTimer');
+            audio.src = '/client/bgm/main.mp3';
+        }
+
+        var game_status = {};
+
+        socket.on('startGame', function (data) {
+            //alert('Game init successful');
+            game_status = data;
+            //console.log(game_status)
+            displayResult(0);
+            updateWave(data);
+            updateCoin(data.coin);
+            updateScore(data.score);
+            updateEnemyHp(data);
+            updatePlayerHp(data);
+            updateQuestion(data);
+            startTimer(data);
+        });
+
+        socket.on('runTimerResponse', function (data) {
+            //console.log(data)
+            game_status.timer.current_time = data.current_time;
+            updateTimer(data.current_time);
+            if (data.timeup) {
+                game_status.player_current_hp = data.player_current_hp;
+                if (game_status.player_current_hp === 0) {
+                    alert('Game over');
+                    gameDiv.style.display = 'none';
+                    menuDiv.style.display = 'inline-block';
+                } else {
+                    updatePlayerHp(game_status);
+                    socket.emit('updateQuestion', game_status);
+                }
+            }
+        });
+
+        socket.on('updateQuestionResponse', function (data) {
+            game_status.question = data.question;
+            game_status.timer.current_time = data.current_time;
+            updateQuestion(game_status);
+            updateTimer(data.current_time);
+        });
+
+        socket.on('checkAnswerResponse', function (data) {
+            if (data.correct) {
+                game_status.enemy_current_hp = data.enemy_current_hp;
+                game_status.score = data.score;
+                game_status.coin = data.coin;
+
+                if (data.enemy_current_hp === 0) {
+                    socket.emit('updateEnemyAndWave', game_status);
+                }
+
+                updateEnemyHp(game_status);
+                updateScore(game_status.score);
+                updateCoin(game_status.coin);
+                displayResult(1);
+            } else {
+                game_status.player_current_hp = data.player_current_hp;
+                if (game_status.player_current_hp === 0) {
+                    alert('Game over');
+                    socket.emit('endTimer');
+                    gameDiv.style.display = 'none';
+                    menuDiv.style.display = 'inline-block';
+                } else {
+                    updatePlayerHp(game_status);
+                    displayResult(2);
+                }
+            }
+        });
+
+        socket.on('updateEnemyAndWaveResponse', function (data) {
+            game_status.current_wave = data.current_wave;
+            game_status.enemy_max_hp = data.enemy_max_hp;
+            game_status.enemy_current_hp = data.enemy_current_hp;
+            updateWave(game_status);
+            updateEnemyHp(game_status);
+        });
+
+        socket.on('gameClear', function (data) {
+            gameDiv.style.display = 'none';
+            resultDiv.style.display = 'inline-block';
+            socket.emit('endTimer');
+            updateResult({
+                score: data.score,
+                coin: data.coin,
+                exp: 50,
+            });
+        });
+
+        socket.on('updatePlayerStatusResponse', function (data) {
+            //console.log(data)
+            var status = 'Name: ' + player_status.name + '\tLevel: ' + player_status.level + '\tExp: ' +
+                player_status.current_exp + ' / ' + player_status.max_exp + '\tCoin: ' +
+                player_status.coin;
+
+            menuDivStatus.innerHTML = status;
+            module1LevelDivStatus.innerHTML = status;
+            module2LevelDivStatus.innerHTML = status;
+        });
+
+        var displayResult = function (num) {
+            switch (num) {
+                case 0:
+                    document.getElementById('gameDiv-answer-response').style.color = "";
+                    document.getElementById('gameDiv-answer-response').innerHTML = '　';
+                    break;
+                case 1:
+                    document.getElementById('gameDiv-answer-response').style.color = "green";
+                    document.getElementById('gameDiv-answer-response').innerHTML = 'Correct!';
+                    break;
+                case 2:
+                    document.getElementById('gameDiv-answer-response').style.color = "red";
+                    document.getElementById('gameDiv-answer-response').innerHTML = 'Wrong!';
+                    break;
+            }
+        }
+
+        var updateWave = function (data) {
+            document.getElementById('gameDiv-wave').innerHTML = 'Wave: ' + data.current_wave + '/' + data.total_wave;
+        }
+
+        var updateCoin = function (coin) {
+            document.getElementById('gameDiv-coin').innerHTML = 'Coin: ' + coin;
+        }
+
+        var updateScore = function (score) {
+            document.getElementById('gameDiv-score').innerHTML = 'Score: ' + score;
+        }
+
+        var updateEnemyHp = function (data) {
+            game_status = data;
+            document.getElementById('gameDiv-enemy-hp').innerHTML = 'Enemy HP: ' + data.enemy_current_hp + '/' +
+                data.enemy_max_hp;
+        }
+
+        var updatePlayerHp = function (data) {
+            document.getElementById('gameDiv-player-hp').innerHTML = 'Player HP: ' + data.player_current_hp + '/' +
+                data.player_max_hp;
+        }
+
+        var updateQuestion = function (data) {
+            //console.log(data.question)
+            document.getElementById("gameDiv-question").innerHTML = 'Question: ' + data.question.content;
+            document.getElementById("gameDiv-ans_a").innerHTML = data.question.ans_list.ans_a;
+            document.getElementById("gameDiv-ans_b").innerHTML = data.question.ans_list.ans_b;
+            document.getElementById("gameDiv-ans_c").innerHTML = data.question.ans_list.ans_c;
+            document.getElementById("gameDiv-ans_d").innerHTML = data.question.ans_list.ans_d;
+        }
+
+        var updatePlayerStatus = function (data) {
+            player_status.current_exp += data.exp;
+
+            if (player_status.current_exp >= player_status.max_exp) {
+                player_status.level++;
+                player_status.current_exp = Math.floor(player_status.current_exp / data.exp);
+                player_status.max_exp = player_status.level * 200;
+            }
+
+            player_status.coin += data.coin;
+            socket.emit('updatePlayerStatus', player_status);
+        }
+
+        var startTimer = function (data) {
+            updateTimer(data.timer.current_time);
+            socket.emit('runTimer', data);
+        }
+
+        var updateTimer = function (current_time) {
+            document.getElementById("gameDiv-timer").innerHTML = 'Timer: ' + current_time;
+        }
+
+        var submitAnswer = function (id) {
+            //console.log(id)
+            //var ans = document.getElementById(id).innerHTML;
+            socket.emit('checkAnswer', {
+                game_status: game_status,
+                ans: id
+            });
+        }
+    </script>
+</body>
+
+</html>
